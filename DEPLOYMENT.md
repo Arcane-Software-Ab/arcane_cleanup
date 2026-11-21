@@ -2,11 +2,11 @@
 
 GitHub Actions builds **Windows**, **macOS**, and **Linux**, signs updater packages, and publishes installers + update manifests to **GitHub Releases**.
 
-A normal `git push` does **not** create a release.
+A normal `git push` does **not** create a release. Use the release script (or push a `v*` tag).
 
 ## One-time setup
 
-### 1. Signing key (already generated on this Mac)
+### 1. Signing key
 
 Private key (keep secret):
 
@@ -15,8 +15,6 @@ Private key (keep secret):
 ```
 
 Public key is already in `backend/tauri.conf.json`.
-
-Add the **full contents** of the private key file as a GitHub Actions secret:
 
 | Secret | Value |
 |--------|--------|
@@ -27,53 +25,56 @@ Repo → **Settings → Secrets and variables → Actions → New repository sec
 
 ### 2. GitHub repo URL in the app
 
-`backend/tauri.conf.json` updater endpoint defaults to:
+Updater endpoint in `backend/tauri.conf.json`:
 
 ```text
 https://github.com/DevelDoe/arcane_cleanup/releases/latest/download/{{target}}-{{arch}}.json
 ```
 
-If your repo path is different, change that URL **before** shipping builds.
+Change that if the repo path is different **before** shipping builds.
 
-## Release steps
+## Release (one command)
 
-### 1. Pull
-
-```sh
-git pull
-```
-
-### 2. Bump version (same in all three)
-
-- `backend/tauri.conf.json`
-- `backend/Cargo.toml`
-- `frontend/package.json`
-
-### 3. Commit and push
+From the repo root:
 
 ```sh
-git add .
-git commit -m "Release v0.1.1"
-git push
+./scripts/release.sh
 ```
 
-### 4. Tag
+That will:
+
+1. `git pull --ff-only`
+2. Bump **patch** version in `tauri.conf.json`, `Cargo.toml`, and `frontend/package.json`
+3. Commit everything (`Release vX.Y.Z`)
+4. Push `main`
+5. Create and push tag `vX.Y.Z` (triggers CI)
+
+### Other bumps
 
 ```sh
-./scripts/release.sh 0.1.1
-git push origin v0.1.1
+./scripts/release.sh          # 0.1.1 -> 0.1.2
+./scripts/release.sh minor    # 0.1.2 -> 0.2.0
+./scripts/release.sh major    # 0.2.0 -> 1.0.0
+./scripts/release.sh 1.4.0    # exact version
 ```
 
-### 5. Wait for CI
+### After it runs
 
-1. **Actions → Build and Release** — all three platforms green  
-2. **Releases** — installers + `*-x86_64.json` / `darwin-aarch64.json` attached  
+1. Open **Actions → Build and Release** — wait for all three platforms  
+2. Download installers from **Releases**
+
+| Platform | File |
+|----------|------|
+| Windows | `Arcane-Cleanup-*-windows-setup.exe` |
+| macOS | `Arcane-Cleanup-*-macos.dmg` |
+| Linux | `Arcane-Cleanup-*-linux.AppImage` |
 
 Installed apps check **latest** GitHub Release on startup and auto-update when a newer signed build is available.
 
 ## Notes
 
+- Commit or include your WIP — the script stages **all** changes into the release commit
 - Do not reuse tags
 - Tags with `-beta` are marked prerelease (`latest` ignores them for updates)
-- Manual test build: **Actions → Build and Release → Run workflow** (no GitHub Release unless you push a tag)
-- If you lose `~/.tauri/arcane-cleanup.key`, you must generate a new keypair and ship a manual update once (old installs cannot verify new signatures)
+- Manual test build: **Actions → Build and Release → Run workflow**
+- If you lose `~/.tauri/arcane-cleanup.key`, generate a new keypair and ship one manual update (old installs cannot verify new signatures)

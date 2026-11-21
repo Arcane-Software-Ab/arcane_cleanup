@@ -64,12 +64,12 @@ cargo tauri build
 
 ## Releases (maintainers)
 
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for signing secrets and the full checklist.
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for signing secrets.
 
 ```sh
-# bump version in tauri.conf.json, Cargo.toml, frontend/package.json
-./scripts/release.sh 0.1.1
-git push origin v0.1.1
+./scripts/release.sh          # bump patch, commit, push, tag
+# ./scripts/release.sh minor
+# ./scripts/release.sh 1.2.0
 ```
 
 ## License
