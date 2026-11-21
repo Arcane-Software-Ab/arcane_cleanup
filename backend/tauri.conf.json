@@ -1,0 +1,43 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Arcane Cleanup",
+  "version": "0.1.0",
+  "identifier": "com.arcanecleanup.app",
+  "build": {
+    "beforeDevCommand": { "script": "npm run dev", "cwd": "../frontend" },
+    "beforeBuildCommand": { "script": "npm run build", "cwd": "../frontend" },
+    "devUrl": "http://localhost:1424",
+    "frontendDist": "../frontend/dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Arcane Cleanup",
+        "width": 1280,
+        "height": 820,
+        "minWidth": 800,
+        "minHeight": 560,
+        "dragDropEnabled": false
+      }
+    ],
+    "security": { "csp": null }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "createUpdaterArtifacts": true,
+    "category": "Utility",
+    "shortDescription": "Find and remove rebuildable project build folders",
+    "longDescription": "Scan a folder tree for target, dist, build, and similar artifacts, review sizes, then delete only what you select.",
+    "icon": ["icons/icon.png"]
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDUwNDUyNTFERUY1MzlBNEIKUldSTG1sUHZIU1ZGVUlzdXd5QUVrdUVpc21RODIzcHp6UUhuR1ZsNEo4TFR3Vll5R0I0ampPVW4K",
+      "endpoints": [
+        "https://github.com/DevelDoe/arcane_cleanup/releases/latest/download/{{target}}-{{arch}}.json"
+      ]
+    }
+  }
+}

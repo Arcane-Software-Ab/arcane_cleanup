@@ -1,0 +1,1 @@
+{"default":{"identifier":"default","description":"Default Arcane Cleanup desktop permissions","local":true,"windows":["main","settings"],"permissions":["core:default","core:window:allow-set-always-on-top","store:default","dialog:default","updater:default","process:default"]}}
