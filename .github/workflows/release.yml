@@ -190,21 +190,28 @@ jobs:
           # Prefer the release tag URL so updater assets stay pinned to this version.
           ARTIFACT_URL="https://github.com/${REPO}/releases/download/${TAG_NAME}/${ARTIFACT_NAME}"
 
-          cat > "upload/${JSON_NAME}" <<EOF
-{
-  "version": "${VERSION}",
-  "notes": "Arcane Cleanup ${VERSION}",
-  "pub_date": "${RELEASE_DATE}",
-  "platforms": {
-    "${TARGET_KEY}": {
-      "signature": "${SIGNATURE}",
-      "url": "${ARTIFACT_URL}"
-    }
-  }
-}
-EOF
+          VERSION="${VERSION}" \
+          RELEASE_DATE="${RELEASE_DATE}" \
+          TARGET_KEY="${TARGET_KEY}" \
+          JSON_NAME="${JSON_NAME}" \
+          SIGNATURE="${SIGNATURE}" \
+          ARTIFACT_URL="${ARTIFACT_URL}" \
+          node -e '
+            const fs = require("fs");
+            const payload = {
+              version: process.env.VERSION,
+              notes: "Arcane Cleanup " + process.env.VERSION,
+              pub_date: process.env.RELEASE_DATE,
+              platforms: {
+                [process.env.TARGET_KEY]: {
+                  signature: process.env.SIGNATURE,
+                  url: process.env.ARTIFACT_URL,
+                },
+              },
+            };
+            fs.writeFileSync("upload/" + process.env.JSON_NAME, JSON.stringify(payload, null, 2) + "\n");
+          '
 
-          # Also publish under the exact Tauri endpoint filename used by /releases/latest/download/
           ls -la upload
 
       - name: Upload CI artifact
